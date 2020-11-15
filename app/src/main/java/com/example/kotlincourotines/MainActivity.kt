@@ -15,16 +15,30 @@ class MainActivity : AppCompatActivity() {
 
         //the coroutines life is tied to the application life duration. Simplest way to launch a coroutine
         GlobalScope.launch {
+            val request1=networkRequest1()
+            val request2=networkRequest2()
 
-            delay(3000L)//similar to the sleep function in threads used to delay the coroutine for 3 s. Will only delay the sepecifc coroutine and not the entire thread
-            Log.d(Constant.TAG, "Thread launched in Coroutine: ${Thread.currentThread().name}")
+            //the suspend functions will both take 6s to launch becoz they are all started from the same coroutine
+            Log.d(Constant.TAG, request1)
+            Log.d(Constant.TAG, request2)
 
-                //The coroutine is also terminated when the main thread terminates
         }
 
-         Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
     }
 
+
+
+    suspend fun networkRequest1(): String {
+        delay(3000L)
+
+        return "My first Network request"
+    }
+
+    suspend fun networkRequest2(): String {
+        delay(3000L)
+
+        return "My second Network request"
+    }
 
 
 }
