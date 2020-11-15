@@ -3,9 +3,7 @@ package com.example.kotlincourotines
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,21 +13,35 @@ class MainActivity : AppCompatActivity() {
 
 
 
-         Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
-    }
 
+        //the coroutine returns a job
+        val job=GlobalScope.launch (Dispatchers.Default){
 
-    //sample function for simple couroutine calls
-    fun simpleCoRoutineCall(){
-        //the coroutines life is tied to the application life duration. Simplest way to launch a coroutine
-        GlobalScope.launch {
+            //withTimeout(5000L){}//used to start a coroutine and cancel it within th specified time time. when ued no need for using run blocking
 
-            delay(3000L)//similar to the sleep function in threads used to delay the coroutine for 3 s. Will only delay the sepecifc coroutine and not the entire thread
-            Log.d(Constant.TAG, "Thread launched in Coroutine: ${Thread.currentThread().name}")
+            repeat(5){
 
-            //The coroutine is also terminated when the main thread terminates
+                Log.d(Constant.TAG, "coroutine is still working..........: ")
+                delay(2000L)
+            }
+
         }
+
+
+
+        runBlocking {
+            job.join()// acts like the delay function
+
+            Log.d(Constant.TAG, "continue with main thread")
+        }
+
+        Log.d(Constant.TAG, "you are in the main thread")
+
+
+       //  Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
     }
+
+
 
 
 }
