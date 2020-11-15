@@ -3,9 +3,8 @@ package com.example.kotlincourotines
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,7 +14,51 @@ class MainActivity : AppCompatActivity() {
 
 
 
-         Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
+        Log.d(Constant.TAG, "Before Run blocking: ")
+
+        //this function will affect the main thread. It is used for launching coroutines in the main thread
+        // can be used to launch parallel coroutines
+        runBlocking {
+
+            Log.d(Constant.TAG, "Thread launched in main thread: ${Thread.currentThread().name}")
+
+            Log.d(Constant.TAG, "Start of Run blocking: ")
+
+
+            launch(Dispatchers.IO) {
+
+                delay(3000)
+
+                Log.d(Constant.TAG, "Coroutine 1: ")
+
+               /* withContext(Dispatchers.IO){
+                    textall.text="I am the Beast"
+                }*/
+
+            }
+
+
+
+            launch(Dispatchers.IO) {
+
+                delay(3000)
+
+                Log.d(Constant.TAG, "Coroutine 2: ")
+
+            }
+
+
+
+
+            delay(6000L)
+        }
+
+        Log.d(Constant.TAG, "End of  Run blocking: ")
+
+
+
+
+          Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
     }
 
 
