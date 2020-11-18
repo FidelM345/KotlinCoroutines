@@ -3,32 +3,80 @@ package com.example.kotlincourotines
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlin.system.measureTimeMillis
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+       // GlobalScope.async {  } this could have been used but we are not returning any value from the coroutine
+        GlobalScope.launch(Dispatchers.IO) {
 
 
+            val time = measureTimeMillis {
 
-         Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
+                //when we want to return a value and make the coroutine to wait until the newtwork call is finished asyc / await should be used
+
+                val ans1 = async {
+                    netwaorCall1()
+                }
+
+                val ans2 = async {
+                    netwaorCall2()
+                }
+
+
+                //await funtion is similar to join function when launch is used. It makes the coroutine to wait until the function finishes executing its job
+                Log.d(Constant.TAG, "The Answer 1 is: ${ans1.await()}")
+                Log.d(Constant.TAG, "The Answer 2 is: ${ans2.await()}")
+
+
+                //alternative but inefficient method to do the same task
+                /*
+                *  val job1= launch{ ans1=netwaorCall1}
+                *  val job2= launch{ ans2=netwaorCall2}
+                * job1.join()
+                * job2.join()
+                * Log.d(Constant.TAG, "The Answer 1 is: ${ans1}")
+                   Log.d(Constant.TAG, "The Answer 2 is: ${ans2}")
+                *
+                * */
+
+            }
+
+            Log.d(Constant.TAG, "The request took $time ms")
+
+        }
+
+
     }
 
 
-    //sample function for simple couroutine calls
-    fun simpleCoRoutineCall(){
-        //the coroutines life is tied to the application life duration. Simplest way to launch a coroutine
-        GlobalScope.launch {
+    suspend fun sequentialMethod() {
+        val answer1 = netwaorCall1()
+        val answer2 = netwaorCall2()
 
-            delay(3000L)//similar to the sleep function in threads used to delay the coroutine for 3 s. Will only delay the sepecifc coroutine and not the entire thread
-            Log.d(Constant.TAG, "Thread launched in Coroutine: ${Thread.currentThread().name}")
 
-            //The coroutine is also terminated when the main thread terminates
-        }
+        Log.d(Constant.TAG, "The Answer 1 is: $answer1")
+        Log.d(Constant.TAG, "The Answer 2 is: $answer2")
+    }
+
+
+
+
+    suspend fun netwaorCall1(): String {
+        delay(3000L)
+
+        return "one"
+    }
+
+
+    suspend fun netwaorCall2(): String {
+        delay(3000L)
+
+        return "two"
     }
 
 
