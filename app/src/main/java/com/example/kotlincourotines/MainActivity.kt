@@ -3,9 +3,17 @@ package com.example.kotlincourotines
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
+
+
+//for firebase to work the data class must be given default values
+data class Person(val name:String="",
+                  val age: Int =0
+)
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,23 +21,39 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
+        val tutorialDocument=Firebase.firestore.collection("coroutine").
+                document("tutorial")
 
 
-         Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
-    }
+        val peter=Person("Peter", 27)
 
 
-    //sample function for simple couroutine calls
-    fun simpleCoRoutineCall(){
-        //the coroutines life is tied to the application life duration. Simplest way to launch a coroutine
-        GlobalScope.launch {
+        GlobalScope.launch (Dispatchers.IO){
+            delay(3000L)
+            //we use the await function on firebase tasks so that the coroutine will wait for the task to finish b4 it proceeds
+            tutorialDocument.set(peter).await() // await() instead of snapshot
 
-            delay(3000L)//similar to the sleep function in threads used to delay the coroutine for 3 s. Will only delay the sepecifc coroutine and not the entire thread
-            Log.d(Constant.TAG, "Thread launched in Coroutine: ${Thread.currentThread().name}")
+           val person=tutorialDocument.get().await().toObject(Person::class.java)
 
-            //The coroutine is also terminated when the main thread terminates
+
+            withContext(Dispatchers.Main){
+
+                textall.text=person.toString()
+            }
+
+
+
         }
+
+
+
+
+
+
     }
+
+
+
 
 
 }
