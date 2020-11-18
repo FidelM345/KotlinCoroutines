@@ -1,8 +1,11 @@
 package com.example.kotlincourotines
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.lifecycle.lifecycleScope
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -14,21 +17,38 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
-         Log.d(Constant.TAG, "Thread launched in main2 thread: ${Thread.currentThread().name}")
-    }
+        button.setOnClickListener {
 
 
-    //sample function for simple couroutine calls
-    fun simpleCoRoutineCall(){
-        //the coroutines life is tied to the application life duration. Simplest way to launch a coroutine
-        GlobalScope.launch {
+            //unlike the Global scope the coroutine will be terminated as soon as we go to another activity
+            lifecycleScope.launch {
 
-            delay(3000L)//similar to the sleep function in threads used to delay the coroutine for 3 s. Will only delay the sepecifc coroutine and not the entire thread
-            Log.d(Constant.TAG, "Thread launched in Coroutine: ${Thread.currentThread().name}")
+                while (true) {
+                    delay(1000L)
+                    Log.d(Constant.TAG, "Coroutine still running.........: ")
+                }
 
-            //The coroutine is also terminated when the main thread terminates
+            }
+
+
+            GlobalScope.launch {
+                delay(5000L)
+                //we use the @Second activity becoz this is taking place inside a coroutine
+                Intent(this@MainActivity, SecondActivity::class.java).also {
+                    startActivity(it)
+                    finish()
+                }
+            }
+
+
+
         }
+
+
+
+
+
+
     }
 
 
